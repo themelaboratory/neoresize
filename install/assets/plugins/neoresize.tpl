@@ -13,7 +13,7 @@
 
 
 if($modx->documentObject['contentType'] != 'application/rss+xml') {
-	define(DIRECTRESIZE_PATH, "assets/plugins/neoresize/");
+	define("DIRECTRESIZE_PATH", "assets/plugins/neoresize/");
 	@require_once $modx->config["base_path"].DIRECTRESIZE_PATH."neoResize.php";
 	$direct = new directResize($config);
 
