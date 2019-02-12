@@ -128,13 +128,24 @@ class directResize {
 		preg_match_all("/(src|height|width|alt|title|class|valign|align|style|hspace|vspace|border)\s*=\s*(['\"])(.*?)\\2/i", $this->current["img_tag"], $match);
 		$result = array_combine($match[1], $match[3]);
 
-		if ($result["style"]) {
-			preg_match_all("/(width|height)\s*:\s*([0-9]+)px/i", $result["style"], $match);
-			if (!empty ($match[1]))
+		/*if ($result["style"]) {
+
+			$result["style"] = rtrim( $result["style"], ';') . ';';
+
+			//$result_style = explode( ';', $result["style"]);
+
+			// get hardcoded image dimension if any
+			preg_match_all("/(width|height|display|margin-left|margin-right)\s*:\s*([a-zA-Z0-9]+);/i", $result["style"], $match);
+
+			if (!empty ($match[1])){
 				$result_style = array_combine($match[1], $match[2]);
-			if (is_array($result_style))
+			}
+
+			if (is_array($result_style)){
 				$result = array_merge($result, $result_style);
-		}
+			}
+		}*/
+
 		return $result;
 	}
 	//-------------------------------------------------------------------------------------------------
