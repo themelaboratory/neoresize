@@ -63,9 +63,13 @@ class directResize
     {
 
         $p = $this->absolutePath($this->current["source"]["src"]);
-        $file = getimagesize($p);
-        $file["width"] = $file[0];
-        $file["height"] = $file[1];
+        if($p){
+           $file = getimagesize($p);
+           $file["width"] = $file[0];
+           $file["height"] = $file[1];
+       }else {
+           $file = [];
+       }
 
         return $file;
     }
