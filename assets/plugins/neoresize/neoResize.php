@@ -1,7 +1,4 @@
 <?php
-/**
- * Class directResize
- */
 
 class directResize
 {
@@ -10,16 +7,15 @@ class directResize
      * directResize constructor.
      * @param $config
      */
-    function __construct($config)
+    public function __construct($config)
     {
         $this->SetConfig($config);
     }
 
-
     /**
      * @param $config
      */
-    function SetConfig($config)
+    public function SetConfig($config)
     {
         global $modx;
 
@@ -55,22 +51,15 @@ class directResize
         }
     }
 
-
     /**
      * @return array|false
      */
-    function OriginalImgSize()
+    public function OriginalImgSize()
     {
+        $file = getimagesize($this->absolutePath($this->current["source"]["src"]));
 
-        $p = $this->absolutePath($this->current["source"]["src"]);
-        if($p){
-           $file = getimagesize($p);
-           $file["width"] = $file[0];
-           $file["height"] = $file[1];
-       }else {
-           $file = [];
-       }
-
+        $file["width"] = $file[0];
+        $file["height"] = $file[1];
         return $file;
     }
 
@@ -81,9 +70,14 @@ class directResize
     {
         $ap = $this->absolutePath($this->current["source"]["src"]);
 
-        if (isset($ap) && $ap != '' && !@ getimagesize($ap)) {
+        if ($ap === false || (isset($ap) && $ap != '' && !@getimagesize($ap))) {
             return false;
         }
+
+        if (!@getimagesize($this->absolutePath($this->current["source"]["src"]))) {
+            return false;
+        }
+
 
         $rules = str_replace("\r", "", $this->drglobal["path"]);
         $rules = explode("\n", $rules);
@@ -101,7 +95,6 @@ class directResize
                 }
             }
         }
-
         $path = $this->absolutePath(dirname($this->current["source"]["src"]));
 
         $longest_deny_path = "";
@@ -120,10 +113,8 @@ class directResize
             }
 
         $result = strlen($longest_deny_path) > strlen($longest_allow_path) ? false : $longest_allow_path;
-
         return $result;
     }
-
 
     /**
      * @param $path
@@ -136,6 +127,7 @@ class directResize
         return $path;
     }
 
+
     /**
      * @param $path
      * @return false|string|string[]
@@ -144,12 +136,9 @@ class directResize
     {
         global $modx;
 
+
         $path = $this->_removeSiteUrl($path);
-
-        // If we gave encoded empry spaces in filename
-        $path = str_replace('%20', ' ', $path);
-
-        if (strstr($path, "://")){
+        if (strstr($path, "://")) {
             return $path;
         }
 
@@ -163,20 +152,13 @@ class directResize
         return $absPath;
     }
 
-
-    /**
-     * @return array
-     */
+    //-------------------------------------------------------------------------------------------------
     function GetCurrentConfig()
     {
         return $this->_getCurrentConfigParms();
     }
 
-
-    /**
-     * @param string $config_name
-     * @return array
-     */
+    //-------------------------------------------------------------------------------------------------
     function _getCurrentConfigParms($config_name = "all")
     {
         if (is_array($this->used_configs[$config_name])) {
@@ -191,10 +173,7 @@ class directResize
         return $current_config;
     }
 
-
-    /**
-     * @return array
-     */
+    //-------------------------------------------------------------------------------------------------
     function _getSourceImgAttr()
     {
         preg_match_all("/(src|height|width|alt|title|class|valign|align|style|hspace|vspace|border)\s*=\s*(['\"])(.*?)\\2/i", $this->current["img_tag"], $match);
@@ -207,24 +186,17 @@ class directResize
             if (is_array($result_style))
                 $result = array_merge($result, $result_style);
         }
-
         return $result;
     }
 
-
-    /**
-     * @return false|mixed|string
-     */
+    //-------------------------------------------------------------------------------------------------
     function _canProcessImage()
     {
         $this->current["longest_allowed_path"] = $this->checkPath();
         return $this->current["longest_allowed_path"];
     }
 
-
-    /**
-     * @return bool
-     */
+    //-------------------------------------------------------------------------------------------------
     function differentSize()
     {
         $check = ($this->current['file']['width'] != $this->current['source']['width'] || $this->current['file']['height'] != $this->current['source']['height'])
@@ -232,21 +204,14 @@ class directResize
         return $check;
     }
 
-
-    /**
-     * @return false|string
-     */
+    //-------------------------------------------------------------------------------------------------
     function onServer()
     {
         $check = strstr($this->current['source']['src'], $this->drglobal['path']);
         return $check;
     }
 
-
-    /**
-     * @param $content
-     * @return mixed|string|string[]
-     */
+    //-------------------------------------------------------------------------------------------------
     function Process($content)
     {
         global $modx;
@@ -255,12 +220,12 @@ class directResize
         $imgs_all = $imgs[0];
 
         for ($n = 0; $n < count($imgs_all); $n++) {
-
-            $this->current = [];
+            $this->current = array();
             $this->current["config"] = $this->GetCurrentConfig();
 
             $this->current["img_tag"] = $imgs_all[$n];
             $this->current["source"] = $this->_getSourceImgAttr();
+
             if ($this->onServer()) {
                 if ($this->_canProcessImage()) {
                     $this->current["file"] = $this->OriginalImgSize();
@@ -271,15 +236,10 @@ class directResize
                 }
             }
         }
-
         return $content;
     }
 
-
-    /**
-     * @param $tpl
-     * @return mixed|string|string[]
-     */
+    //-------------------------------------------------------------------------------------------------
     function ParseTemplate($tpl)
     {
         global $modx;
@@ -296,4 +256,5 @@ class directResize
         return $drtemplate->Render();
     }
 }
+
 ?>
